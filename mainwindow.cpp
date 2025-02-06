@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    workerForDB.connectToDatabase();
     //TODO: подключение/создание БД
     //TODO: старт потока для инкрементирования
 

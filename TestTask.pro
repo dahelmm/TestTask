@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,11 +10,13 @@ CONFIG += c++17
 
 SOURCES += \
     counter.cpp \
+    databaseworker.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     counter.h \
+    databaseworker.h \
     mainwindow.h
 
 FORMS += \
