@@ -1,6 +1,8 @@
 #ifndef DATABASEWORKER_H
 #define DATABASEWORKER_H
 
+#include "counter.h"
+
 #include <QObject>
 #include <QSql>
 #include <QSqlDatabase>
@@ -16,6 +18,9 @@ class DatabaseWorker : public QObject
 
         void connectToDatabase();
         void closeDatabase();
+
+        void saveCounters(QVector<Counter*> &counters);
+        QVector<Counter *> loadCounters();
 
     private:
         bool createDataBase();

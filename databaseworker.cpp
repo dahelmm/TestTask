@@ -38,6 +38,47 @@ void DatabaseWorker::closeDatabase()
         p_database.close();
 }
 
+void DatabaseWorker::saveCounters(QVector<Counter *> & counters)
+{
+    if(!p_database.isOpen() || counters.isEmpty())
+        return;
+    QSqlQuery queryForDeletingData;
+    if(!queryForDeletingData.exec("DELETE FROM Counters")){
+        qWarning()<<QString("DB: error for deleting data")<<queryForDeletingData.lastError().text();
+        return;
+    }
+    foreach(auto *counter, counters){
+        QSqlQuery query;
+        query.prepare("INSERT INTO Counters (idCounter, valueCounter) VALUES (:id, :value)");
+        query.bindValue(":id", counter->getId());
+        query.bindValue(":value", counter->getValue());
+        if(!query.exec()){
+            qWarning()<<QString("DB: error saving counter %1").arg(counter->getId())<<query.lastError().text();
+            p_database.rollback();
+        }
+    }
+}
+
+
+QVector<Counter *> DatabaseWorker::loadCounters()
+{
+    QVector<Counter *> result;
+    if(!p_database.isOpen())
+        return result;
+    QSqlQuery query("SELECT * FROM Counters");
+    if(!query.exec()){
+        qWarning()<<"DB: error with load data"<<query.lastError().text();
+        return result;
+    }
+    while(query.next()){
+        int idCounter = query.value(0).toInt();
+        int valueCounter = query.value(1).toInt();
+        Counter *counter = new Counter(idCounter, valueCounter);
+        result.append(counter);
+    }
+    return result;
+}
+
 bool DatabaseWorker::createDataBase()
 {
     if(openDataBase()){
@@ -60,7 +101,6 @@ bool DatabaseWorker::createTable()
 {
     QSqlQuery query;
     if (!query.exec(QString("CREATE TABLE %1 ("
-                            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                             "idCounter INTEGER, "
                             "valueCounter INTEGER);")
                     .arg("Counters"))) {

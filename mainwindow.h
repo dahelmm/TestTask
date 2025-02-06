@@ -26,6 +26,10 @@ class MainWindow : public QMainWindow
         void on_bttnSave_clicked();
 
     private:
+        void initializationUI();
+        void addCounterToUI(Counter *counter);
+
+    private:
         Ui::MainWindow *ui;
 
         DatabaseWorker p_workerForDB;

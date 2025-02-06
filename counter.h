@@ -7,13 +7,17 @@
 
 class Counter : public QObject
 {
+        Q_OBJECT
     public:
-        Counter(int id, QObject *parent = nullptr);
+        Counter(int id, int value = 0, QObject *parent = nullptr);
 
         int getValue() const { return p_value; };
         int getId() const { return p_id; };
 
-        void increment() { p_value+=1; };
+        void increment();
+
+    signals:
+        void valueChanged();
 
     private:
         int p_id;
@@ -31,6 +35,8 @@ class CounterDirector : public QObject
         void removeCounter(int const numberCounter);
         void incrementCounters();
         QVector<Counter*> & counters() & { return p_counters; };
+        void loadCounters(QVector<Counter*> counters);
+        void deleteCounters();
 
         void start();
         void stop();

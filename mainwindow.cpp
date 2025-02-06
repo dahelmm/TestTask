@@ -20,25 +20,26 @@ MainWindow::MainWindow(QWidget *parent)
 
     //подключение/создание БД
     p_workerForDB.connectToDatabase();
-    //TODO: инициализация данных из БД
-    //TODO: старт потока для инкрементирования
+    //инициализация данных из БД
+    p_counterDirector.loadCounters(p_workerForDB.loadCounters());
+    initializationUI();
+    //старт потока для инкрементирования
+    p_counterDirector.start();
     //TODO: подсчет частоты инкрементирования счетчиков и вывод значения в label
 }
 
 MainWindow::~MainWindow()
 {
-    //TODO: тормоз потока для инкрементирования
+    //тормоз потока для инкрементирования
+    p_counterDirector.stop();
     delete ui;
 }
 
 void MainWindow::on_bttnAddCounter_clicked()
 {
-    //создание счетчика и добавление его значения в таблицу
+    // создание счетчика и добавление его значения в таблицу
     Counter *addedCounter = p_counterDirector.addCounter();
-    int rowCountInDisplay = ui->tableWidgetDisplay->rowCount();
-    ui->tableWidgetDisplay->insertRow(rowCountInDisplay);
-    ui->tableWidgetDisplay->setItem(rowCountInDisplay, idCounter, new QTableWidgetItem(QString::number(addedCounter->getId())));
-    ui->tableWidgetDisplay->setItem(rowCountInDisplay, valueCounter, new QTableWidgetItem(QString::number(addedCounter->getValue())));
+    addCounterToUI(addedCounter);
 }
 
 void MainWindow::on_bttnDeleteCounter_clicked()
@@ -52,4 +53,26 @@ void MainWindow::on_bttnDeleteCounter_clicked()
 void MainWindow::on_bttnSave_clicked()
 {
     //TODO: проверка подключения к БД, запись значений счетчиков
+    p_workerForDB.saveCounters(p_counterDirector.counters());
+}
+
+void MainWindow::initializationUI()
+{
+    foreach (auto *counter, p_counterDirector.counters()) {
+        addCounterToUI(counter);
+    }
+}
+
+void MainWindow::addCounterToUI(Counter * counter)
+{
+    if(!counter)
+        return;
+    int rowCountInDisplay = ui->tableWidgetDisplay->rowCount();
+    connect(counter, &Counter::valueChanged, this, [=] () {
+        ui->tableWidgetDisplay->setItem(rowCountInDisplay, valueCounter, new QTableWidgetItem(QString::number(counter->getValue())));
+    }, Qt::QueuedConnection);
+
+    ui->tableWidgetDisplay->insertRow(rowCountInDisplay);
+    ui->tableWidgetDisplay->setItem(rowCountInDisplay, idCounter, new QTableWidgetItem(QString::number(counter->getId())));
+    ui->tableWidgetDisplay->setItem(rowCountInDisplay, valueCounter, new QTableWidgetItem(QString::number(counter->getValue())));
 }
