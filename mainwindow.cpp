@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QTimer>
+#include <QtConcurrent/QtConcurrent>
+
 enum ColumnsForTable {
     idCounter = 0,
     valueCounter
@@ -25,7 +28,13 @@ MainWindow::MainWindow(QWidget *parent)
     initializationUI();
     //старт потока для инкрементирования
     p_counterDirector.start();
-    //TODO: подсчет частоты инкрементирования счетчиков и вывод значения в label
+    //подсчет частоты инкрементирования счетчиков и вывод значения в label
+    QTimer *incrementFreqTimer = new QTimer(this);
+    incrementFreqTimer->setInterval(100);
+    connect(incrementFreqTimer, &QTimer::timeout, this, &MainWindow::calculateIncrementTime);
+    incrementFreqTimer->start();
+
+    p_elapsedTimer.start();
 }
 
 MainWindow::~MainWindow()
@@ -52,8 +61,28 @@ void MainWindow::on_bttnDeleteCounter_clicked()
 
 void MainWindow::on_bttnSave_clicked()
 {
-    //TODO: проверка подключения к БД, запись значений счетчиков
+    //проверка подключения к БД, запись значений счетчиков
     p_workerForDB.saveCounters(p_counterDirector.counters());
+}
+
+void MainWindow::calculateIncrementTime()
+{
+    static int64_t prevSummCounters = 0;
+    static double prevTimeMoment = 0;
+
+    int64_t currentSummCounters = 0;
+    foreach(auto *counter, p_counterDirector.counters()){
+        currentSummCounters += counter->getValue();
+    }
+
+    double currentElapseTime = p_elapsedTimer.elapsed() / 1000.0;
+
+    double freqIncrement = (currentSummCounters - prevSummCounters)/(currentElapseTime - prevTimeMoment);
+
+    ui->labelFreqIncrement->setText(QString::number(static_cast<int>(freqIncrement)));
+
+    prevTimeMoment = currentElapseTime;
+    prevSummCounters = currentSummCounters;
 }
 
 void MainWindow::initializationUI()

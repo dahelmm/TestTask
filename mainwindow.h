@@ -5,6 +5,7 @@
 #include "databaseworker.h"
 
 #include <QMainWindow>
+#include <QElapsedTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,6 +26,8 @@ class MainWindow : public QMainWindow
         void on_bttnDeleteCounter_clicked();
         void on_bttnSave_clicked();
 
+        void calculateIncrementTime();
+
     private:
         void initializationUI();
         void addCounterToUI(Counter *counter);
@@ -34,5 +37,6 @@ class MainWindow : public QMainWindow
 
         DatabaseWorker p_workerForDB;
         CounterDirector p_counterDirector;
+        QElapsedTimer p_elapsedTimer;
 };
 #endif // MAINWINDOW_H
