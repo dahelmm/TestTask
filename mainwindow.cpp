@@ -7,10 +7,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //подключение/создание БД
     workerForDB.connectToDatabase();
-    //TODO: подключение/создание БД
+    //TODO: инициализация данных из БД
     //TODO: старт потока для инкрементирования
-
     //TODO: подсчет частоты инкрементирования счетчиков и вывод значения в label
 }
 
