@@ -10,7 +10,8 @@ Counter::Counter(int id, QObject * parent) :
 
 CounterDirector::CounterDirector(QObject *parent) :
     QObject(parent),
-    p_running(false)
+    p_running(false),
+    p_idCurrentCounter(0)
 {
 
 }
@@ -29,16 +30,16 @@ CounterDirector::~CounterDirector()
     p_counters.clear();
 }
 
-void CounterDirector::addCounter(Counter *counter)
+Counter *CounterDirector::addCounter()
 {
-    if(!counter)
-        return;
+    Counter *counter = new Counter(p_idCurrentCounter++, this);
     p_counters.append(counter);
+    return counter;
 }
 
 void CounterDirector::removeCounter(const int numberCounter)
 {
-    if(numberCounter >= p_counters.count())
+    if(numberCounter >= p_counters.count() || numberCounter < 0)
         return;
     Counter *removingCounter = p_counters.takeAt(numberCounter);
     removingCounter->deleteLater();

@@ -27,7 +27,7 @@ class CounterDirector : public QObject
         CounterDirector(QVector<Counter*> counters, QObject *parent = nullptr);
         ~CounterDirector();
 
-        void addCounter(Counter * counter);
+        Counter *addCounter();
         void removeCounter(int const numberCounter);
         void incrementCounters();
         QVector<Counter*> & counters() & { return p_counters; };
@@ -39,6 +39,7 @@ class CounterDirector : public QObject
         QVector<Counter*>       p_counters;
         std::thread             p_threadForIncrement;
         bool                    p_running;
+        int                     p_idCurrentCounter;
 };
 
 #endif // COUNTER_H

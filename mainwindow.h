@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "counter.h"
 #include "databaseworker.h"
 
 #include <QMainWindow>
@@ -27,6 +28,7 @@ class MainWindow : public QMainWindow
     private:
         Ui::MainWindow *ui;
 
-        DatabaseWorker workerForDB;
+        DatabaseWorker p_workerForDB;
+        CounterDirector p_counterDirector;
 };
 #endif // MAINWINDOW_H
